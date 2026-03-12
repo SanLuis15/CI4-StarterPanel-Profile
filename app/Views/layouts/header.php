@@ -25,12 +25,20 @@
             </li>
             <li class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="<?= base_url('assets/images/avatar4.png') ?>" class="user-image rounded-circle shadow" alt="User Image" />
+                    <?php if (!empty(session()->get('profile_image'))): ?>
+                        <img src="<?= base_url('uploads/profiles/' . session()->get('profile_image')) ?>" class="user-image rounded-circle shadow" alt="User Image" style="width: 25px; height: 25px; object-fit: cover;" />
+                    <?php else: ?>
+                        <img src="<?= base_url('assets/images/avatar4.png') ?>" class="user-image rounded-circle shadow" alt="User Image" />
+                    <?php endif; ?>
                     <span class="d-none d-md-inline"><?= session()->get('fullname') ?? 'User' ?></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                     <li class="user-header text-bg-primary">
-                        <img src="<?= base_url('assets/images/avatar4.png') ?>" class="rounded-circle shadow" alt="User Image" />
+                        <?php if (!empty(session()->get('profile_image'))): ?>
+                            <img src="<?= base_url('uploads/profiles/' . session()->get('profile_image')) ?>" class="rounded-circle shadow" alt="User Image" style="width: 80px; height: 80px; object-fit: cover;" />
+                        <?php else: ?>
+                            <img src="<?= base_url('assets/images/avatar4.png') ?>" class="rounded-circle shadow" alt="User Image" />
+                        <?php endif; ?>
                         <p><?= session()->get('fullname') ?? 'User' ?><small>Member since 2024</small></p>
                     </li>
                     <li class="user-body">

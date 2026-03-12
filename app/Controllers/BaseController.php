@@ -60,6 +60,11 @@ abstract class BaseController extends Controller
         $this->ApplicationModel = new ApplicationModel();
 
         $user    = $this->ApplicationModel->getUser(username: session()->get('username'));
+        
+        // Update session with latest profile image if user exists
+        if ($user && isset($user['profile_image'])) {
+            session()->set('profile_image', $user['profile_image']);
+        }
         $segment = $this->segment->getSegment(1);
         if ($segment) {
             $subsegment = $this->segment->getSegment(2);

@@ -28,6 +28,7 @@ class Auth extends BaseController
                         'username'        => $user['username'],
                         'fullname'        => $user['fullname'],
                         'role'            => $user['role'],
+                        'profile_image'   => $user['profile_image'] ?? '',
                         'isLoggedIn'     => TRUE
                     ]);
                     return redirect()->to(base_url('dashboard'));

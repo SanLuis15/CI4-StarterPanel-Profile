@@ -116,6 +116,9 @@ class ProfileController extends BaseController
         if ($this->userModel->updateProfile($userId, $updateData)) {
             session()->set('fullname', $updateData['fullname']);
             session()->set('username', $updateData['username']);
+            if (isset($updateData['profile_image'])) {
+                session()->set('profile_image', $updateData['profile_image']);
+            }
             return redirect()->to('/profile')->with('success', 'Profile updated successfully!');
         }
 
