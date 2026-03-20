@@ -19,26 +19,42 @@ class Auth extends BaseController
             $inputEmail     = $this->request->getVar('inputEmail');
             $inputPassword  = $this->request->getVar('inputPassword');
             $db = \Config\Database::connect();
-            $user = $db->table('users')->where('username', $inputEmail)->get()->getRowArray();
+            $user = $db->table('users')
+                ->select('users.*, roles.name as role_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->where('username', $inputEmail)
+                ->get()->getRowArray();
             if ($user) {
                 $password        = $user['password'];
                 $verify = password_verify($inputPassword, $password);
                 if ($verify) {
                     session()->set([
+                        'user' => [
+                            'id' => $user['id'],
+                            'name' => $user['fullname'],
+                            'email' => $user['username'],
+                            'role' => $user['role_name'],
+                        ],
+                        // Maintain original project's top level session data
                         'username'        => $user['username'],
                         'fullname'        => $user['fullname'],
                         'role'            => $user['role'],
                         'profile_image'   => $user['profile_image'] ?? '',
-                        'isLoggedIn'     => TRUE
+                        'isLoggedIn'      => TRUE
                     ]);
-                    return redirect()->to(base_url('dashboard'));
+                    return match($user['role_name']) {
+                        'admin' => redirect()->to('/dashboard'),
+                        'teacher' => redirect()->to('/dashboard'),
+                        'student' => redirect()->to('/student/dashboard'),
+                        default => redirect()->to('/login'),
+                    };
                 } else {
                     session()->setFlashdata('notif_error', '<b>Your ID or Password is Wrong !</b> ');
-                    return redirect()->to(base_url());
+                    return redirect()->to(base_url('login'));
                 }
             } else {
                 session()->setFlashdata('notif_error', '<b>Your ID or Password is Wrong!</b> ');
-                return redirect()->to(base_url());
+                return redirect()->to(base_url('login'));
             }
         }
     }
@@ -50,10 +66,18 @@ class Auth extends BaseController
 
     public function forbiddenPage()
     {
-        $data = array_merge($this->data, [
+        $data = array_merge($this->data ?? [], [
             'title'         => 'Forbidden Page'
         ]);
         return view('pages/commons/forbidden', $data);
+    }
+
+    public function unauthorized()
+    {
+        $data = array_merge($this->data ?? [], [
+            'title' => 'Unauthorized Access'
+        ]);
+        return view('errors/unauthorized', $data);
     }
 
     public function register()

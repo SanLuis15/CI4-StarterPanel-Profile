@@ -106,20 +106,20 @@ class ApplicationModel extends Model
     {
         if ($username) {
             return $this->db->table('users')
-                ->select('*,users.id AS userID,user_role.id AS role_id')
-                ->join('user_role', 'users.role = user_role.id')
-                ->where(['username' => $username])
+                ->select('users.*, roles.id AS role_id, roles.name as role_name, roles.label as role_label')
+                ->join('roles', 'users.role_id = roles.id', 'left')
+                ->where(['users.username' => $username])
                 ->get()->getRowArray();
         } elseif ($userID) {
             return $this->db->table('users')
-                ->select('*,users.id AS userID,user_role.id AS role_id')
-                ->join('user_role', 'users.role = user_role.id')
+                ->select('users.*, roles.id AS role_id, roles.name as role_name, roles.label as role_label')
+                ->join('roles', 'users.role_id = roles.id', 'left')
                 ->where(['users.id' => $userID])
                 ->get()->getRowArray();
         } else {
             return $this->db->table('users')
-                ->select('*,users.id AS userID,user_role.id AS role_id')
-                ->join('user_role', 'users.role = user_role.id')
+                ->select('users.*, roles.id AS role_id, roles.name as role_name, roles.label as role_label')
+                ->join('roles', 'users.role_id = roles.id', 'left')
                 ->get()->getResultArray();
         }
     }
@@ -156,9 +156,9 @@ class ApplicationModel extends Model
     public function getUserRole($role = false)
     {
         if ($role) {
-            return $this->db->table('user_role')->where(['id' => $role])->get()->getRowArray();
+            return $this->db->table('roles')->where(['id' => $role])->get()->getRowArray();
         }
-        return $this->db->table('user_role')->get()->getResultArray();
+        return $this->db->table('roles')->get()->getResultArray();
     }
 
     /**
@@ -173,8 +173,8 @@ class ApplicationModel extends Model
             'fullname'    => $dataUser['inputFullname'],
             'username'    => $dataUser['inputUsername'],
             'password'    => password_hash($dataUser['inputPassword'], PASSWORD_DEFAULT),
-            'role'        => $dataUser['inputRole'],
-            'created_at'  => date('Y-m-d h:i:s')
+            'role_id'     => $dataUser['inputRole'],
+            'created_at'  => date('Y-m-d H:i:s')
         ]);
     }
 
@@ -196,7 +196,7 @@ class ApplicationModel extends Model
             'fullname'        => $dataUser['inputFullname'],
             'username'         => $dataUser['inputUsername'],
             'password'         => $password,
-            'role'             => $dataUser['inputRole'],
+            'role_id'          => $dataUser['inputRole'],
         ], ['id' => $dataUser['userID']]);
     }
 
@@ -219,7 +219,10 @@ class ApplicationModel extends Model
      */
     public function createRole($dataRole)
     {
-        return $this->db->table('user_role')->insert(['role_name' => $dataRole['inputRoleName']]);
+        return $this->db->table('roles')->insert([
+            'name'  => strtolower($dataRole['inputRoleName']),
+            'label' => $dataRole['inputRoleName']
+        ]);
     }
 
     /**
@@ -230,7 +233,10 @@ class ApplicationModel extends Model
      */
     public function updateRole($dataRole)
     {
-        return $this->db->table('user_role')->update(['role_name' => $dataRole['inputRoleName']], ['id' => $dataRole['roleID']]);
+        return $this->db->table('roles')->update([
+            'name'  => strtolower($dataRole['inputRoleName']),
+            'label' => $dataRole['inputRoleName']
+        ], ['id' => $dataRole['roleID']]);
     }
 
     /**
@@ -241,7 +247,7 @@ class ApplicationModel extends Model
      */
     public function deleteRole($role)
     {
-        return $this->db->table('user_role')->delete(['id' => $role]);
+        return $this->db->table('roles')->delete(['id' => $role]);
     }
 
     /**

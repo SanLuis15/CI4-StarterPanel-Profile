@@ -11,11 +11,13 @@ class UserModel extends Model
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $useSoftDeletes = false;
+    protected $deletedField = 'deleted_at';
     
     protected $allowedFields = [
-        'fullname', 'username', 'password', 'role',
+        'fullname', 'username', 'password', 'role', 'role_id',
         'student_id', 'course', 'year_level',
-        'section', 'phone', 'address', 'profile_image'
+        'section', 'phone', 'address', 'profile_image', 'deleted_at'
     ];
 
     public function updateProfile(int $userId, array $data): bool

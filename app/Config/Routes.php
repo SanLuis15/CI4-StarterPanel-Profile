@@ -14,53 +14,61 @@ $routes->get('blocked', 'Auth::forbiddenPage');
 $routes->get('register', 'Auth::register');
 $routes->post('register', 'Auth::registration');
 
-$routes->get('dashboard', 'Home::index');
-$routes->get('dashboard-v2', 'Home::dashboardV2');
-$routes->get('dashboard-v3', 'Home::dashboardV3');
+$routes->get('unauthorized', 'Auth::unauthorized');
 
-// Profile routes
-$routes->get('profile', 'ProfileController::show');
-$routes->get('profile/edit', 'ProfileController::edit');
-$routes->post('profile/update', 'ProfileController::update');
-
-// Students CRUD routes
-$routes->get('students', 'Student::index');
-$routes->get('students/show/(:num)', 'Student::show/$1');
-$routes->get('students/edit/(:num)', 'Student::edit/$1');
-$routes->post('students/store', 'Student::store');
-$routes->post('students/update/(:num)', 'Student::update/$1');
-$routes->post('students/delete/(:num)', 'Student::delete/$1');
-
-// Records CRUD routes
-$routes->get('records', 'Records::index');
-$routes->get('records/create', 'Records::create');
-$routes->get('records/show/(:num)', 'Records::show/$1');
-$routes->get('records/edit/(:num)', 'Records::edit/$1');
-$routes->post('records/store', 'Records::store');
-$routes->post('records/update/(:num)', 'Records::update/$1');
-$routes->post('records/delete/(:num)', 'Records::delete/$1');
-
-// Setting Routes
-$routes->group('users', static function ($routes) {
-    $routes->get('/', 'Settings::users');
-    $routes->post('create-role', 'Settings::createRole');
-    $routes->post('update-role', 'Settings::updateRole');
-    $routes->delete('delete-role/(:num)', 'Settings::deleteRole/$1');
-
-    $routes->get('role-access', 'Settings::roleAccess');
-    $routes->post('create-user', 'Settings::createUser');
-    $routes->post('update-user', 'Settings::updateUser');
-    $routes->delete('delete-user/(:num)', 'Settings::deleteUser/$1');
-
-    $routes->post('change-menu-permission', 'Settings::changeMenuPermission');
-    $routes->post('change-menu-category-permission', 'Settings::changeMenuCategoryPermission');
-    $routes->post('change-submenu-permission', 'Settings::changeSubMenuPermission');
+$routes->group('', ['filter' => ['auth', 'student']], static function ($routes) {
+    // Assuming StudentController is created to handle student dashboard, or we use Home
+    $routes->get('student/dashboard', 'StudentController::dashboard');
 });
 
-$routes->group('menu-management', static function ($routes) {
-    $routes->get('/', 'Settings::menuManagement');
-    $routes->post('create-menu-category', 'Settings::createMenuCategory');
-    $routes->post('create-menu', 'Settings::createMenu');
-    $routes->post('create-submenu', 'Settings::createSubMenu');
+$routes->group('', ['filter' => ['auth']], static function ($routes) {
+    $routes->get('records', 'Records::index');
+    $routes->get('records/show/(:num)', 'Records::show/$1');
+
+    // Shared Profile routes for ALL roles
+    $routes->get('profile', 'ProfileController::show');
+    $routes->get('profile/edit', 'ProfileController::edit');
+    $routes->post('profile/update', 'ProfileController::update');
+
+    // Shared View Settings route for ALL roles
+    $routes->get('settings', 'ProfileController::settings');
 });
-$routes->get('menu','Menu::index');
+
+$routes->group('', ['filter' => ['auth', 'teacher']], static function ($routes) {
+    $routes->get('dashboard', 'Home::index');
+    $routes->get('dashboard-v2', 'Home::dashboardV2');
+    $routes->get('dashboard-v3', 'Home::dashboardV3');
+
+    $routes->get('students', 'Student::index');
+    $routes->get('students/show/(:num)', 'Student::show/$1');
+    $routes->get('students/edit/(:num)', 'Student::edit/$1');
+    $routes->post('students/store', 'Student::store');
+    $routes->post('students/update/(:num)', 'Student::update/$1');
+    $routes->post('students/delete/(:num)', 'Student::delete/$1');
+});
+
+$routes->group('', ['filter' => ['auth', 'records_editor']], static function ($routes) {
+    $routes->get('records/create', 'Records::create');
+    $routes->get('records/edit/(:num)', 'Records::edit/$1');
+    $routes->post('records/store', 'Records::store');
+    $routes->post('records/update/(:num)', 'Records::update/$1');
+    $routes->post('records/delete/(:num)', 'Records::delete/$1');
+});
+
+$routes->group('', ['filter' => ['auth', 'coordinator']], static function ($routes) {
+    // Shared functionality accessed
+});
+
+$routes->group('admin', ['filter' => ['auth', 'admin']], static function ($routes) {
+    $routes->get('roles', 'Admin\RoleController::index');
+    $routes->get('roles/create', 'Admin\RoleController::create');
+    $routes->post('roles/store', 'Admin\RoleController::store');
+    $routes->get('roles/edit/(:num)', 'Admin\RoleController::edit/$1');
+    $routes->post('roles/update/(:num)', 'Admin\RoleController::update/$1');
+    $routes->get('roles/delete/(:num)', 'Admin\RoleController::delete/$1');
+
+    $routes->get('users', 'Admin\UserAdminController::index');
+    $routes->post('users/assign-role/(:num)', 'Admin\UserAdminController::assignRole/$1');
+    $routes->post('users/store', 'Admin\UserAdminController::storeUser');
+    $routes->post('users/delete/(:num)', 'Admin\UserAdminController::deleteUser/$1');
+});

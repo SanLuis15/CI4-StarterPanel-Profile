@@ -6,10 +6,7 @@
                     <i class="bi bi-list"></i>
                 </a>
             </li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li>
-            <li class="nav-item d-none d-md-block"><a href="<?= base_url('students') ?>" class="nav-link">Students</a></li>
-            <li class="nav-item d-none d-md-block"><a href="<?= base_url('profile') ?>" class="nav-link">My Profile</a></li>
+            <?php $role = session('user')['role'] ?? ''; ?>
         </ul>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item">

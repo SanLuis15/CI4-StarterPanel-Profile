@@ -4,7 +4,9 @@
     <div class="row">
         <div class="col-12 mb-3">
             <h2 class="m-0">Records Management</h2>
-            <a href="/records/create" class="btn btn-primary mt-2">Add New Record</a>
+            <?php if (session('user')['role'] === 'admin'): ?>
+                <a href="/records/create" class="btn btn-primary mt-2">Add New Record</a>
+            <?php endif; ?>
         </div>
         <div class="col-12">
             <div class="card">
@@ -41,11 +43,15 @@
                                 <td><?= date('M d, Y', strtotime($record['created_at'])) ?></td>
                                 <td>
                                     <a href="/records/show/<?= $record['id'] ?>" class="btn btn-sm btn-info">View</a>
-                                    <a href="/records/edit/<?= $record['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="/records/delete/<?= $record['id'] ?>" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this record?')">
-                                        <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
+                                    <?php if (in_array(session('user')['role'], ['admin', 'teacher', 'coordinator'])): ?>
+                                        <a href="/records/edit/<?= $record['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <?php endif; ?>
+                                    <?php if (session('user')['role'] === 'admin'): ?>
+                                        <form action="/records/delete/<?= $record['id'] ?>" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this record?')">
+                                            <?= csrf_field() ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endforeach; else: ?>

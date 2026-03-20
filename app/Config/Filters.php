@@ -4,8 +4,12 @@ namespace Config;
 
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
-use App\Filters\Authorization;
-use App\Filters\Authentication;
+use App\Filters\AuthFilter;
+use App\Filters\StudentFilter;
+use App\Filters\TeacherFilter;
+use App\Filters\AdminFilter;
+use App\Filters\CoordinatorFilter;
+use App\Filters\RecordsEditorFilter;
 use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\ForceHTTPS;
@@ -36,8 +40,12 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'isLoggedIn'    => Authentication::class,
-        'isGranted'     => Authorization::class,
+        'auth'          => AuthFilter::class,
+        'student'       => StudentFilter::class,
+        'teacher'       => TeacherFilter::class,
+        'admin'         => AdminFilter::class,
+        'coordinator'   => CoordinatorFilter::class,
+        'records_editor'=> RecordsEditorFilter::class,
     ];
 
     /**
@@ -73,8 +81,6 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            'isLoggedIn' => ['except' => ['/', 'register', 'login', 'students', 'students/*', 'records', 'records/*']],
-            'isGranted'  => ['except' => ['/', 'register', 'login', 'logout', 'blocked', 'dashboard', 'dashboard-v2', 'dashboard-v3', 'students', 'students/*', 'records', 'records/*', 'users', 'users/*', 'menu-management', 'menu-management/*', 'profile', 'profile/*']],
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',

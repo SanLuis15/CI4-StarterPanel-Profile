@@ -54,6 +54,9 @@
                             <dt class="col-sm-4">Full Name:</dt>
                             <dd class="col-sm-8"><?= esc($user['fullname']) ?></dd>
 
+                            <dt class="col-sm-4">Role:</dt>
+                            <dd class="col-sm-8"><span class="badge bg-info"><?= esc($role_label) ?></span></dd>
+
                             <dt class="col-sm-4">Username:</dt>
                             <dd class="col-sm-8"><?= esc($user['username']) ?></dd>
 

@@ -27,7 +27,10 @@ class ProfileController extends BaseController
             return redirect()->to('/login');
         }
 
-        $data = array_merge($this->data, ['user' => $user]);
+        $data = array_merge($this->data, [
+            'user' => $user,
+            'role_label' => $user['role_label'] ?? ucfirst($user['role'] ?? 'User')
+        ]);
         return view('profile/show', $data);
     }
 
@@ -123,5 +126,22 @@ class ProfileController extends BaseController
         }
 
         return redirect()->back()->withInput()->with('error', 'Failed to update profile.');
+    }
+
+    public function settings()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/login');
+        }
+        
+        $roleName = session('user')['role'] ?? '';
+        $canEdit = ($roleName === 'admin');
+
+        $data = array_merge($this->data, [
+            'title' => 'Settings',
+            'canEdit' => $canEdit
+        ]);
+        
+        return view('profile/settings', $data);
     }
 }
